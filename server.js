@@ -1,16 +1,23 @@
-var http = require("http");
-var url = require("url");
+var express = require('express'),
+    path = require('path'),
+    http = require('http'),
+    wine = require('./routes/wines');
 
-function start(route, handle) {
-  function onRequest(request, response) {
-    var pathname = url.parse(request.url).pathname;
-    console.log("Request for " + pathname + " received.");
-    route(handle, pathname, response, request);
-  }
+var app = express();
 
-  var port = process.env.PORT || 5000;
-  http.createServer(onRequest).listen(port);
-  console.log("Server has started.");
-}
+app.configure(function () {
+    app.set('port', process.env.PORT || 3000);
+    app.use(express.logger('dev'));  /* 'default', 'short', 'tiny', 'dev' */
+    app.use(express.bodyParser()),
+    app.use(express.static(path.join(__dirname, 'public')));
+});
 
-exports.start = start;
+app.get('/wines', wine.findAll);
+app.get('/wines/:id', wine.findById);
+app.post('/wines', wine.addWine);
+app.put('/wines/:id', wine.updateWine);
+app.delete('/wines/:id', wine.deleteWine);
+
+http.createServer(app).listen(app.get('port'), function () {
+    console.log("Express server listening on port " + app.get('port'));
+});
