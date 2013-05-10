@@ -1,22 +1,19 @@
 var mongo = require('mongodb');
 
-var Server = mongo.Server,
-    Db = mongo.Db,
-    BSON = mongo.BSONPure;
+var BSON = mongo.BSONPure;
 
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('winedb', server, {safe: true});
+var mongoUri = process.env.MONGOLAB_URI || 
+  process.env.MONGOHQ_URL || 
+  'mongodb://localhost/mydb'; 
 
-db.open(function(err, db) {
-    if(!err) {
-        console.log("Connected to 'winedb' database");
-        db.collection('wines', {safe:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
-                populateDB();
-            }
-        });
-    }
+mongo.Db.connect(mongoUri, function (err, db) {
+    db.collection('wines', {safe:true}, function(err, collection) {
+        if (err) {
+            console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
+            populateDB();
+        }
+    });
+    this.db=db;
 });
 
 exports.findById = function(req, res) {
