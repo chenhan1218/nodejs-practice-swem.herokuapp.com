@@ -1,49 +1,53 @@
-var targets = [{
-        name: 'first trade',
-        id: 1111,
-        wanted: true
-    }, {
-        name: '1234',
-        id: 1234,
-        wanted: true
-    }, {
-        name: 'second trade',
-        id: 2222,
-        wanted: true
-    }
-];
-
 T_tbody = _.template($('#t-stocks').html());
-disabledStock = {};
+var targets = $.ajax({
+    'async': false,
+    'global': false,
+    'url': 'json/data.json',
+    'dataType': "json"
+});
+
+targets = JSON.parse(targets.responseText);
 
 function calculate() {
-    var arr = $.map($('input:checkbox:checked'), function(e, i) {
-        return +e.value;
-    });
+    var sum = targets.reduce(function(sum, target) {
+        if (target.wanted) {
+            sum += target.portion;
+        }
+        return sum;
+    }, 0);
 
-    $('span').text('the checked values are: ' + arr.join(','));
-    var data = [];
-    _.each(targets, function(target, index) {
-        var row = target;
-        row['index'] = index;
-        row['percentage'] = 0;
-        row['amount'] = 0;
-        data.push(row);
-    });
     $('#stocks').html(T_tbody({
-        stocks: data
+        stocks: targets.map(function(target) {
+            if (target.wanted) {
+                target['ownPercentage'] = target.portion / sum * 100;
+            } else {
+                target['ownPercentage'] = 0;
+            }
+            target['ownPercentage'] = target['ownPercentage'].toFixed(3);
+            target['amount'] = 0;
+            return target;
+        })
     }));
 
-    var reduced = targets.filter(function(target, i) {
+    $('span').text('the checked values are: ' +
+        targets.filter(function(target, i) {
         return target.wanted;
     }).map(function(target, i) {
         return target.name;
-    });
-    $('span').text('the checked values are: ' + reduced);
+    }));
+
 }
 
 $(function() {
     // init
+    targets.sort(function(a, b) {
+        return b.portion - a.portion;
+    });
+    targets = targets.map(function(target, index) {
+        target['wanted'] = true;
+        target['index'] = index;
+        return target;
+    });
     calculate();
 
     window.toggleStop = function(index) {

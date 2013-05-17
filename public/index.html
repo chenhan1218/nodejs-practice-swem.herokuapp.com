@@ -10,7 +10,7 @@
     
     <body>
         <table>
-            <tr> <td> name </td> <td> id </td> <td> wanted </td> <td> percentage </td> <td> amount </td> </tr>
+            <tr> <td> name </td> <td> id </td> <td> wanted </td> <td> shares </td> <td> avaliblePercentage </td> <td> portion </td> <td> ownPercentage </td> <td> amount </td> </tr>
             <tbody id="stocks"></tbody>
         </table>
 <span></span>
@@ -18,7 +18,7 @@
         <script id="t-stocks" type="text/template">
             <% _.each(stocks, function(stock) { %> <tr > <td > <%= stock.name %> </td> <td > <%= stock.id %> </td>
   <td > <button onclick = "toggleStop(<%= stock.index %>)"
-                class = "btn btn-<%= stock.wanted ? "success" : "danger" %>" > <%= stock.wanted ? "Yes" : "No" %> <td > <%= stock.percentage %> </td> <td > <%= stock.amount %> </td> </td>
+                class = "btn btn-<%= stock.wanted ? "success" : "danger" %>" > <%= stock.wanted ? "Yes" : "No" %> <td > <%= stock.shares %> </td> <td > <%= stock.avaliblePercentage %> </td> <td > <%= stock.portion %> </td> <td > <%= stock.ownPercentage %> </td> <td > <%= stock.amount %> </td> </td>
 </tr > <%
             }); %>
         </script>
